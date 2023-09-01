@@ -202,21 +202,14 @@ function getJobListingHTML(jobData, filterTags = []) {
         return '';
     }
 
-    const tagsString = tagsList.reduce((acc, currentTag) => {
-        const activeClass = (filterTags.includes(currentTag) && TAG_ACTIVE_CLASS) || '';
-
-        return acc + getTagHTML(currentTag, `${TAG_CLASS} ${activeClass}`);
-    }, '');
-
+    const tagsString = tagsList.map(currentTag => {
+      const activeClass = (filterTags.includes(currentTag) && TAG_ACTIVE_CLASS) || '';
+      return getTagHTML(currentTag, `${TAG_CLASS} ${activeClass}`);
+    }).join('');
     return jobListingHTML.replace(JOB_TAGS_PLACEHOLDER, tagsString);
 };
 
-function toggleClass(el, className) {
-    if (el.classList.contains(className)) {
-        el.classList.remove(className);
-
-        return;
-    }
+function addClass(el, className) {
     
     el.classList.add(className);
 }
@@ -236,11 +229,10 @@ function getSearchBarTags(tagValue, searchContentEl) {
 }
 
 function setJobsListings(filterTags) {
-    const jobsListingsHTML = jobsListings.reduce((acc, currentListing) => {
-        return acc + getJobListingHTML(currentListing, filterTags);
-    }, '');
-    
-    document.getElementById('jobs').innerHTML = jobsListingsHTML;
+  const jobsListingsHTML = jobsListings.map(currentListing => getJobListingHTML(currentListing, filterTags))
+    .join('');
+
+  document.getElementById('jobs').innerHTML = jobsListingsHTML;
 }
 
 function displaySearchWrapper(display = false) {
@@ -256,9 +248,10 @@ function displaySearchWrapper(display = false) {
 }
 
 function setSearchbarContent(searchContentEl, tags) {
-    searchContentEl.innerHTML = tags.reduce((acc, currentTag) => {
-        return acc + getTagHTML(currentTag, CLOSE_TAG_CLASS);
-    }, '');
+  const tagsHTML = tags.map(currentTag => getTagHTML(currentTag, CLOSE_TAG_CLASS))
+    .join('');
+
+  searchContentEl.innerHTML = tagsHTML;
 }
 
 function resetState(searchContentEl) {
@@ -266,7 +259,7 @@ function resetState(searchContentEl) {
 
     setJobsListings();
     displaySearchWrapper(false);
-    toggleClass(targetEl, TAG_ACTIVE_CLASS);
+    addClass(targetEl, TAG_ACTIVE_CLASS);
 }
 
 window.addEventListener('click', (event) => {
@@ -286,7 +279,7 @@ window.addEventListener('click', (event) => {
     }
 
     setSearchbarContent(searchContentEl, searchBarTags);
-    toggleClass(targetEl, TAG_ACTIVE_CLASS);
+    addClass(targetEl, TAG_ACTIVE_CLASS);
     displaySearchWrapper(searchBarTags.length > 0);
     setJobsListings(searchBarTags);
 });
